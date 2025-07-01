@@ -22,6 +22,49 @@ from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
 
 
+class MaskValueError(ValueError):
+
+    def __str__(self):
+        return self.message
+
+
+class NoMissingError(MaskValueError):
+    message = 'The weight matrix is too good! It should have a zero element.'
+
+
+class ZeroColumnError(MaskValueError):
+
+    def __init__(self, n):
+        self.message = f'The weight matrix has {n} zero colomns!'
+
+
+class ZeroRowError(MaskValueError):
+
+    def __init__(self, n):
+        self.message = f'The weight matrix has {n} zero rows!'
+
+
+def _check(M, raise_error=False):
+    try:
+        if np.any(np.all(M ==0, axis=0)):
+            N = np.nonzero(np.all(M ==0, axis=0))[0].size
+            raise ZeroColumnError(N)
+        elif np.any(np.all(M ==0, axis=1)):
+            N = np.nonzero(np.all(M ==0, axis=1))[0].size
+            raise ZeroRowError(N)
+        elif np.all(M==1):
+            raise NoMissingError()
+    except ValueError as e:
+        if isinstance(e, NoMissingError):
+            raise e
+        elif isinstance(e, ZeroColumnError):
+            raise e
+        elif raise_error:
+            raise e
+        else:
+            print(e)
+
+
 class MissingMixin:
 
     """Mixin class for missing value model
@@ -37,7 +80,7 @@ class MissingMixin:
     max_impute_iter = 20
     init_impute_strategy = None
 
-    def init_impute(self, X, missing_matrix=None, strategy='mean'):
+    def init_impute(self, X, missing_matrix=None, strategy='mean', check=False):
         """initalize to impute
         
         Args:
@@ -55,6 +98,9 @@ class MissingMixin:
             return self.X_imputed_
         if missing_matrix is None:
             return X
+
+        if check:
+            _check(missing_matrix)
 
         mask = ~missing_matrix  # mask matrix
         if strategy == 'mean':
