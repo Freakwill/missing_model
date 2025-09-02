@@ -80,7 +80,7 @@ class MissingMixin:
     max_impute_iter = 20
     init_impute_strategy = None
 
-    def init_impute(self, X, missing_matrix=None, strategy='mean', check=False):
+    def init_impute(self, X, missing_matrix=None, strategy=None, check=False):
         """initalize to impute
         
         Args:
@@ -98,6 +98,9 @@ class MissingMixin:
             return self.X_imputed_
         if missing_matrix is None:
             return X
+
+        if strategy is None:
+            strategy = self.init_impute_strategy
 
         if check:
             _check(missing_matrix)
@@ -119,8 +122,8 @@ class MissingMixin:
         elif isinstance(strategy, np.ndarray):
             assert X.shape == strategy.shape
             X[mask] = strategy[mask]
-        elif callable(stragegy):
-            X = stragegy(X, mask)
+        elif callable(strategy):
+            X = strategy(X, mask)
         elif strategy == 'none':
             pass
         else:
@@ -167,6 +170,9 @@ class MissingMixin:
     def fit_imptue(self, X_missing, missing_matrix):
         self.fit(X_missing, missing_matrix)
         return self.impute(X_missing, missing_matrix)
+
+    def __call__(self, *args, **kwargs):
+        return self.fit_imptue(*args, **kwargs)
 
     def reconstruct(self, X):
         if not hasattr(self, 'inverse_transform'):
