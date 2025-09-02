@@ -13,6 +13,17 @@ Gibbs sampling:
     2. do PCA for X imputed in 1-step, and get Z
     3. calculate nv, Psi from Z and priori parameters
       Sigma ~ IW(nv, Psi)
+
+---
+Attributes:
+    1. missing_matrix: missing matrix
+    2. init_impute_strategy: initial imputing strategy
+
+Methods:
+    1. fit(X, R)          # fit with missing matrix (R)
+    2. full_fit(X)        # call the fit method of super model/class without missing matrix
+    3. impute(X, R)       # return imputing result
+    4. fit_impute(X, R)   # fit then impute
 """
 
 import numpy as np
