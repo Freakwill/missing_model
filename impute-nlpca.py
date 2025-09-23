@@ -1,18 +1,7 @@
 #!/usr/bin/env python3
 
 """
-X = [X1, X2] ~ N(0, V Sigma V' + sigma^2), Sigma ~ IW (inverse Wishart)
-or Z = X V ~ N(0, Sigma)
-or X = Z V^T + sigma^2
-Sigma ~ IW(nv0, Psi0)
-
-Gibbs sampling:
-    0. initalize Sigma V by all samples (set hidden values as 0s)
-    1. calculate mu', Sigma' from X1 and Cov matrix of X
-      X2 ~ N(mu', Sigma')
-    2. do PCA for X imputed in 1-step, and get Z
-    3. calculate nv, Psi from Z and priori parameters
-      Sigma ~ IW(nv, Psi)
+Imputing data based on NL PCA
 """
 
 import numpy as np
